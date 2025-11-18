@@ -122,3 +122,16 @@ export async function file(filePath: string): Promise<SourceResult> {
     data: response,
   };
 }
+
+export async function api(
+  url: string,
+  options: RequestInit = {},
+): Promise<SourceResult> {
+  const response = await fetch(url, options);
+  const text = await response.text();
+
+  return {
+    type: "text",
+    data: text,
+  };
+}

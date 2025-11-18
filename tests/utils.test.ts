@@ -1,7 +1,6 @@
 import { expect, test, describe, afterEach, assert } from "vitest";
-import * as z from "zod";
 import { oa } from "../src";
-import { guard, parallel, pipe } from "../src/utils";
+import { parallel } from "../src/utils";
 import { file } from "../src/source";
 
 import fs from "node:fs/promises";

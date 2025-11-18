@@ -7,9 +7,10 @@ import {
   beforeEach,
   vi,
 } from "vitest";
-import { search, web, web_custom, csv } from "../src/source";
+import { search, web, web_custom, csv, api } from "../src/source";
 import { pipe } from "../src/utils";
 import { oa } from "../src/index";
+import { testServer } from "../tests/helpers";
 import fs from "fs/promises";
 import * as z from "zod";
 
@@ -113,5 +114,23 @@ describe("Check ollama search is working", () => {
     const url = "https://gdo-studio.si";
     vi.stubEnv("OLLAMA_API_KEY", "");
     await expect(search(url)).rejects.toThrowError();
+  });
+});
+
+describe("Check that api endpoint is working as it should", () => {
+  test("Check that basic api call works", async () => {
+    const { prompt } = await oa({
+      model: "qwen2.5-coder:7b",
+      stream: false,
+    });
+    const url = "http://localhost:8888";
+    const test = await testServer((req, res) => {
+      res.end("The temperature is 55 celsius");
+    });
+    const data = await pipe(api(url), [
+      prompt("What is the temperature return only the temperature?"),
+    ]);
+    expect(data.message.content).contain("55");
+    test.server.close();
   });
 });
