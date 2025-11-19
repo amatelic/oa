@@ -3,6 +3,7 @@ import { expect, test, describe, afterEach, assert } from "vitest";
 import { oa } from "../src";
 import { ChatRequest } from "ollama";
 import { OllamaSchemaParams } from "../src/types/types";
+import { setTimeout } from "node:timers/promises";
 
 const globalonfig = {
   model: "qwen2.5-coder",
@@ -85,5 +86,29 @@ describe("Check prefix examples", async () => {
     const response2 = await oraPrompt.setPrompt("Give me a joke").call();
     console.log(response2.message.content);
     expect(response2.message.content).includes("ora ora");
+  });
+});
+
+describe("Check if abort command is working", async () => {
+  const { prompt } = await oa({
+    model: "qwen3:4b",
+    stream: false,
+    config: {
+      options: {
+        num_ctx: 512,
+        temperature: 0,
+      },
+    },
+  });
+
+  test("Check that prefix is working", async () => {
+    const oraPrompt = prompt("What is the meaning of life").think(false);
+
+    setTimeout(10).then(() => {
+      oraPrompt.abort();
+    });
+    await Promise.all([oraPrompt.call()]).catch((error) => {
+      expect(error.name).toBe("AbortError");
+    });
   });
 });

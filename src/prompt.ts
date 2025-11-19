@@ -1,4 +1,4 @@
-import ollama, { ChatRequest, Message } from "ollama";
+import ollama, { ChatRequest, Message, Ollama } from "ollama";
 import {
   ChatReturnType,
   OllamaOptionsSchema,
@@ -18,6 +18,7 @@ export class Prompt<T extends { stream?: boolean; model: string }> {
   private stop: string[];
   private prefix: string = "";
   private postfix: string = "";
+  private ollama: Ollama;
 
   constructor(prompt: string, config: T) {
     this.prompt = prompt;
@@ -26,6 +27,7 @@ export class Prompt<T extends { stream?: boolean; model: string }> {
     this.images = [];
     this.stop = [];
     this._think = false;
+    this.ollama = new Ollama();
   }
 
   setConfig(config: Partial<OllamaSchemaParams>, merge = false) {
@@ -71,6 +73,9 @@ export class Prompt<T extends { stream?: boolean; model: string }> {
   addPostfix(prefix: string) {
     this.postfix = `${prefix} `;
     return this;
+  }
+  abort() {
+    this.ollama.abort();
   }
   createMessage(): ChatRequest {
     const message = this.source
@@ -123,7 +128,7 @@ export class Prompt<T extends { stream?: boolean; model: string }> {
       });
       return result as ChatReturnType<T>;
     } else {
-      const result = await ollama.chat({
+      const result = await this.ollama.chat({
         ...configMessage,
         stream: false,
       });
@@ -135,14 +140,14 @@ export class Prompt<T extends { stream?: boolean; model: string }> {
     const configMessage = this.createMessage();
     // Runtime dispatch based on stream value
     if (configMessage.stream) {
-      const result = await ollama.chat({
+      const result = await this.ollama.chat({
         ...configMessage,
         think: false,
         stream: true,
       });
       return result as ChatReturnType<T>;
     } else {
-      const result = await ollama.chat({
+      const result = await this.ollama.chat({
         ...configMessage,
         think: false,
         stream: false,
