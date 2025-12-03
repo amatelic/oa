@@ -12,6 +12,7 @@ export const ollama_models = [
   "qwen3-vl:235b-instruct",
   "qwen3-vl:235b",
   "minimax-m2",
+  "mistral-large-3:675b-cloud",
 
   // other modules
   "llama2",
@@ -36,6 +37,13 @@ export const ollama_models = [
   "mistral-small3.2",
   "mistral:instruct",
   "mistral:latest",
+
+  "ministral-3:3b",
+  "ministral-3:8b",
+  "ministral-3:14b",
+  "ministral-3:3b-cloud",
+  "ministral-3:8b-cloud",
+  "ministral-3:14b-cloud",
   "mixtral",
   "mixtral:8x7b",
   "mixtral:8x22b",
