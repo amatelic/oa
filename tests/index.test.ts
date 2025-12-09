@@ -1,4 +1,4 @@
-import { expect, test, describe } from "vitest";
+import { expect, test, describe, vi } from "vitest";
 import { createServer } from "node:http";
 
 import { oa } from "../src";
@@ -41,7 +41,7 @@ const config = {
 
 describe("Make basi ai example", () => {
   test("should fail to connect", async () => {
-    expect(
+    await expect(
       oa({
         ...config,
         url: "http://localhost:34355",
@@ -51,7 +51,7 @@ describe("Make basi ai example", () => {
 
   test("should check if ollama is running", async () => {
     await UtilTestingServer.serverMessage("Ngnix server");
-    expect(
+    await expect(
       oa({
         ...config,
         url: url,
@@ -76,7 +76,6 @@ describe("Make basi ai example", () => {
 
     expect(chunks[0].message.content).toBe("4");
   });
-
   test("create basic prompt", async () => {
     const { prompt } = await oa({
       ...config,
